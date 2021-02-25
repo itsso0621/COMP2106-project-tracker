@@ -3,6 +3,7 @@ const router = express.Router();
 
 const Course = require("../models/course");
 
+// GET /courses/add
 router.get("/add", (req, res, next) => {
   res.render("courses/add", { title: "Add a course" });
 });
