@@ -7,6 +7,7 @@ var logger = require("morgan");
 var indexController = require("./controllers/index");
 var usersController = require("./controllers/users");
 var projectsController = require("./controllers/projects");
+var coursesController = require("./controllers/courses");
 
 var app = express();
 
@@ -23,6 +24,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", indexController);
 app.use("/users", usersController);
 app.use("/projects", projectsController);
+app.use("/courses", coursesController);
 
 // mongodb connection
 const mongoose = require("mongoose");
