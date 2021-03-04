@@ -1,5 +1,6 @@
 // reference to mongoose
 const mongoose = require("mongoose");
+const router = require("../controllers/courses");
 
 // define project schema
 var projectSchema = new mongoose.Schema({
