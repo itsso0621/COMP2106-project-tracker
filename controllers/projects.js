@@ -7,6 +7,18 @@ const Project = require("../models/project");
 const Course = require("../models/course");
 const project = require("../models/project");
 
+// add passport for quth checking
+const passport = require("passport");
+
+// auth check for access control to create/edit/delete methods
+function isLoggedIn(req, res, next) {
+  if (req.isAuthenticated()) {
+    // user is already authenticated
+    return next(); // do the next thing in the request i.e. continue with the calling function
+  }
+
+  res.redirect("/login"); // anonymous user tried to access a private method => go to login
+}
 /** GET /projects */
 router.get("/", (req, res, next) => {
   Project.find((err, projects) => {
@@ -17,13 +29,14 @@ router.get("/", (req, res, next) => {
       res.render("projects/index", {
         title: "My Projects",
         projects: projects,
+        user: req.user,
       });
     }
   });
 });
 
 /** GET /projects/add */
-router.get("/add", (req, res, next) => {
+router.get("/add", isLoggedIn, (req, res, next) => {
   //use Course model to fetch list of courses for dropdown
   Course.find((err, courses) => {
     if (err) {
@@ -32,13 +45,14 @@ router.get("/add", (req, res, next) => {
       res.render("projects/add", {
         title: "Project Details",
         courses: courses,
+        user: req.user,
       });
     }
   }).sort({ courseCode: 1 });
 });
 
 /** POST /projects/add */
-router.post("/add", (req, res, next) => {
+router.post("/add", isLoggedIn, (req, res, next) => {
   // use the Project model to save the form data to MongoDB
   Project.create(
     {
@@ -58,7 +72,7 @@ router.post("/add", (req, res, next) => {
 });
 
 // GET /projects/delete/abc123
-router.get("/delete/:_id", (req, res, next) => {
+router.get("/delete/:_id", isLoggedIn, (req, res, next) => {
   //use the Project model to delete the selected document
   Project.remove({ _id: req.params._id }, (err) => {
     if (err) {
@@ -97,7 +111,7 @@ router.get("/delete/:_id", (req, res, next) => {
 // });
 
 /* GET /projects/edit/abc123 */
-router.get("/edit/:_id", (req, res, next) => {
+router.get("/edit/:_id", isLoggedIn, (req, res, next) => {
   Project.findById(req.params._id, (err, project) => {
     if (err) {
       console.log(err);
@@ -111,6 +125,7 @@ router.get("/edit/:_id", (req, res, next) => {
             title: "Project Details",
             project: project,
             courses: courses,
+            user: req.user,
           });
         }
       }).sort({ courseCode: 1 });
@@ -119,7 +134,7 @@ router.get("/edit/:_id", (req, res, next) => {
 });
 
 // POST /projects/edit/abc123
-router.post("/edit/:_id", (req, res, next) => {
+router.post("/edit/:_id", isLoggedIn, (req, res, next) => {
   Project.findOneAndUpdate(
     { _id: req.params._id },
     {
